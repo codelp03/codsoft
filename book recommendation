@@ -1,0 +1,44 @@
+import random
+
+# List of recommended books
+recommended_books = [
+    "Gone Girl by Gillian Flynn",
+    "The Girl with the Dragon Tattoo by Stieg Larsson",
+    "The Silent Patient by Alex Michaelides",
+    "Dune by Frank Herbert",
+    "Neuromancer by William Gibson",
+    "The Martian by Andy Weir",
+    "A Song of Ice and Fire Series by George R.R. Martin",
+    "The Name of the Wind by Patrick Rothfuss",
+    "Mistborn Trilogy by Brandon Sanderson",
+    "Atomic Habits by James Clear",
+    "The Subtle Art of Not Giving a F*ck by Mark Manson",
+    "Educated by Tara Westover",
+    "All the Light We Cannot See by Anthony Doerr",
+    "The Nightingale by Kristin Hannah",
+    "The Book Thief by Markus Zusak",
+    "To Kill a Mockingbird by Harper Lee",
+    "Pride and Prejudice by Jane Austen",
+    "1984 by George Orwell",
+    "Sapiens: A Brief History of Humankind by Yuval Noah Harari",
+    "The Immortal Life of Henrietta Lacks by Rebecca Skloot",
+    "Cosmos by Carl Sagan",
+    "Becoming by Michelle Obama",
+    "Steve Jobs by Walter Isaacson",
+    "The Glass Castle by Jeannette Walls",
+    "Harry Potter Series by J.K. Rowling",
+    "Percy Jackson and the Olympians Series by Rick Riordan",
+    "The Hunger Games Trilogy by Suzanne Collins",
+    "Maus by Art Spiegelman",
+    "Watchmen by Alan Moore and Dave Gibbons",
+    "Persepolis by Marjane Satrapi"
+]
+
+# Function to recommend a random book
+def recommend_book():
+    return random.choice(recommended_books)
+
+# Get a random book recommendation
+random_book = recommend_book()
+print("Recommended Book:")
+print(random_book)
