@@ -1,0 +1,37 @@
+import random
+import spacy
+
+# Load spaCy language model
+nlp = spacy.load("en_core_web_sm")
+
+# Define a dictionary of predefined responses
+responses = {
+    "hello": ["Hello!", "Hi there!", "Hey! How can I help you?"],
+    "how_are_you": ["I'm just a computer program, but I'm here to assist you!", "I'm doing well. Thanks for asking."],
+    "bye": ["Goodbye!", "See you later!", "Have a great day!"],
+    "thank_you": ["You're welcome!", "Anytime!", "Glad I could help!"],
+    "name": ["I don't have a name, but you can call me ChatBot.", "I go by ChatBot."],
+    "help": ["Sure! I can assist you with general information and answer questions.", "What do you need help with?"],
+    "default": ["I'm not sure I understand.", "Could you please rephrase that?", "Sorry, I didn't get that."],
+}
+
+# Function to get a response based on user input
+def get_response(input_text):
+    input_text = input_text.lower()
+    doc = nlp(input_text)
+
+    for token in doc:
+        if token.text in responses:
+            return random.choice(responses[token.text])
+    
+    return random.choice(responses["default"])
+
+# Chat loop
+print("Chatbot: Hello! How can I assist you today? (Type 'bye' to exit)")
+while True:
+    user_input = input("You: ")
+    if user_input.lower() == 'bye':
+        print("Chatbot: Goodbye!")
+        break
+    response = get_response(user_input)
+    print("Chatbot:", response)
