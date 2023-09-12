@@ -1,0 +1,148 @@
+import numpy as np
+import pandas as pd
+
+books = pd.read_csv('Books.csv')
+users = pd.read_csv('Users.csv')
+ratings = pd.read_csv('Ratings.csv')
+
+books.head()
+
+users.head()
+
+ratings.head()
+
+print(books.shape)
+print(ratings.shape)
+print(users.shape)
+
+
+books.isnull().sum()
+
+users.isnull().sum()
+
+
+ratings.isnull().sum()
+
+books.duplicated().sum()
+
+books=books.drop_duplicates()
+
+books.duplicated().sum()
+
+
+ratings.duplicated().sum()
+
+ratings=ratings.drop_duplicates()
+
+
+ratings.duplicated().sum()
+
+
+users.duplicated().sum()
+
+users=users.drop_duplicates()
+
+users.duplicated().sum()
+
+# Popularity Based Recommender System
+
+ratings_with_name = ratings.merge(books,on='ISBN')
+
+num_rating_df = ratings_with_name.groupby('Book-Title').count()['Book-Rating'].reset_index()
+num_rating_df.rename(columns={'Book-Rating':'num_ratings'},inplace=True)
+num_rating_df
+
+
+avg_rating_df = ratings_with_name.groupby('Book-Title').mean()['Book-Rating'].reset_index()
+avg_rating_df.rename(columns={'Book-Rating':'avg_rating'},inplace=True)
+avg_rating_df
+
+popular_df = num_rating_df.merge(avg_rating_df,on='Book-Title')
+popular_df
+
+popular_df = popular_df[popular_df['num_ratings']>=250].sort_values('avg_rating',ascending=False).head(50)
+
+
+popular_df = popular_df.merge(books,on='Book-Title').drop_duplicates('Book-Title')[['Book-Title','Book-Author','Image-URL-M','num_ratings','avg_rating']]
+popular_df['Image-URL-M'][0]
+
+# Collaborative Filtering Based Recommender System
+
+x = ratings_with_name.groupby('User-ID').count()['Book-Rating'] > 200
+padhe_likhe_users = x[x].index
+
+filtered_rating = ratings_with_name[ratings_with_name['User-ID'].isin(padhe_likhe_users)]
+
+y = filtered_rating.groupby('Book-Title').count()['Book-Rating']>=50
+famous_books = y[y].index
+
+
+final_ratings = filtered_rating[filtered_rating['Book-Title'].isin(famous_books)]
+
+pt = final_ratings.pivot_table(index='Book-Title',columns='User-ID',values='Book-Rating')
+
+pt.fillna(0,inplace=True)
+
+pt
+
+from sklearn.metrics.pairwise import cosine_similarity
+
+similarity_scores = cosine_similarity(pt)
+
+similarity_scores.shape
+
+def recommend(book_name):
+    # index fetch
+    index = np.where(pt.index==book_name)[0][0]
+    similar_items = sorted(list(enumerate(similarity_scores[index])),key=lambda x:x[1],reverse=True)[1:5]
+
+    data = []
+    for i in similar_items:
+        item = []
+        temp_df = books[books['Book-Title'] == pt.index[i[0]]]
+        item.extend(list(temp_df.drop_duplicates('Book-Title')['Book-Title'].values))
+        item.extend(list(temp_df.drop_duplicates('Book-Title')['Book-Author'].values))
+        item.extend(list(temp_df.drop_duplicates('Book-Title')['Image-URL-M'].values))
+
+        data.append(item)
+
+    return data
+
+pt.index[5]
+
+import pickle
+pickle.dump(popular_df,open('popular.pkl','wb'))
+
+books.drop_duplicates('Book-Title')
+
+import pandas as pd
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import linear_kernel
+
+# Load your book dataset into a DataFrame
+
+# Preprocess and clean the data
+
+# Use TF-IDF to convert book descriptions into numerical features
+tfidf_vectorizer = TfidfVectorizer(stop_words='english')
+tfidf_matrix = tfidf_vectorizer.fit_transform(books['Book-Author'])
+
+# Compute similarity scores between books using cosine similarity
+cosine_sim = linear_kernel(tfidf_matrix, tfidf_matrix)
+
+# User's input preferences (e.g., a book title)
+user_input = "The Catcher in the Rye"
+
+# Get the index of the user's book
+book_index = books[books['Book-Title'] == user_input].index[0]
+
+# Get the top N book recommendations based on similarity
+n_recommendations = 5
+similarity_scores = list(enumerate(cosine_sim[book_index]))
+similarity_scores = sorted(similarity_scores, key=lambda x: x[1], reverse=True)[1:n_recommendations+1]
+
+# Print the recommended book titles
+recommended_books = [books.iloc[i[0]]['Book-Title'] for i in similarity_scores]
+print("Recommended Books:")
+for book in recommended_books:
+    print(book)
