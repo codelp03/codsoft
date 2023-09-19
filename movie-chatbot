@@ -1,0 +1,63 @@
+import random
+
+# Define a list of movies with titles, genres, and ratings
+movies = [
+    {"title": "The Shawshank Redemption", "genre": "Drama", "rating": 9.3},
+    {"title": "The Godfather", "genre": "Crime", "rating": 9.2},
+    {"title": "Pulp Fiction", "genre": "Crime", "rating": 8.9},
+    {"title": "The Dark Knight", "genre": "Action", "rating": 9.0},
+    {"title": "Inception", "genre": "Sci-Fi", "rating": 8.8},
+    {"title": "Schindler's List", "genre": "Drama", "rating": 8.9},
+    {"title": "Forrest Gump", "genre": "Drama", "rating": 8.8},
+    {"title": "The Matrix", "genre": "Sci-Fi", "rating": 8.7},
+    {"title": "Gladiator", "genre": "Action", "rating": 8.5},
+    {"title": "The Lord of the Rings: The Fellowship of the Ring", "genre": "Fantasy", "rating": 8.8},
+    # Add more movies here
+]
+
+# Initialize a user profile with an empty list of rated movies
+user_profile = []
+
+# Function to recommend a movie based on user's rated movies
+def recommend_movie():
+    unrated_movies = [movie for movie in movies if movie not in user_profile]
+    if unrated_movies:
+        recommended_movie = random.choice(unrated_movies)
+        return recommended_movie
+    else:
+        return "You've rated all available movies. Great job!"
+
+# Function to get movie information
+def get_movie_info(movie_title):
+    for movie in movies:
+        if movie["title"].lower() == movie_title.lower():
+            return f"{movie['title']} ({movie['genre']}) - Rating: {movie['rating']}"
+    return "Movie not found. Please enter a valid movie title."
+
+# Chat loop
+print("Chatbot: Hello! How can I assist you today? (Type 'bye' to exit)")
+while True:
+    user_input = input("You: ").lower()
+    if user_input == 'bye':
+        print("Chatbot: Goodbye!")
+        break
+    elif "recommend a movie" in user_input:
+        recommendation = recommend_movie()
+        if isinstance(recommendation, dict):
+            print(f"Chatbot: I recommend '{recommendation['title']}' in the '{recommendation['genre']}' genre.")
+            user_rating = float(input("You: Please rate this movie (1.0 to 10.0): "))
+            if 1.0 <= user_rating <= 10.0:
+                recommendation["rating"] = user_rating
+                user_profile.append(recommendation)
+                print(f"Chatbot: You rated '{recommendation['title']}' with {user_rating} stars.")
+            else:
+                print("Chatbot: Invalid rating. Please enter a rating between 1.0 and 10.0.")
+        else:
+            print("Chatbot:", recommendation)
+    elif "movie info" in user_input:
+        print("Chatbot: Sure, please enter the movie title.")
+        movie_title = input("You: ").strip()
+        movie_info = get_movie_info(movie_title)
+        print("Chatbot:", movie_info)
+    else:
+        print("Chatbot: I'm not sure how to respond to that. Please ask another question.")
